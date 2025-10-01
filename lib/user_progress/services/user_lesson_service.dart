@@ -1,5 +1,7 @@
 import 'package:kisolo/core/config/supabase_config.dart';
 import 'package:kisolo/user_progress/models/user_lesson.dart';
+import 'package:kisolo/levels/services/level_service.dart';
+import 'package:kisolo/lessons/services/lesson_service.dart';
 
 class UserLessonService {
   static const String _tableName = 'user_lessons';
@@ -13,11 +15,18 @@ class UserLessonService {
           .eq('user_id', userId)
           .order('created_at');
 
-      return (response as List)
-          .map((json) => UserLesson.fromJson(json))
-          .toList();
+      final lessons =
+          (response as List).map((json) => UserLesson.fromJson(json)).toList();
+
+      // If no lessons exist, initialize with first level lessons
+      if (lessons.isEmpty) {
+        return await _initializeFirstLessons(userId);
+      }
+
+      return lessons;
     } catch (e) {
-      throw Exception('Erreur lors de la récupération des leçons utilisateur: $e');
+      throw Exception(
+          'Erreur lors de la récupération des leçons utilisateur: $e');
     }
   }
 
@@ -28,7 +37,6 @@ class UserLessonService {
           .from(_tableName)
           .select('lesson_id, lesson:lesson_id(level_id)')
           .eq('user_id', userId)
-          .order('updated_at', ascending: false)
           .limit(1)
           .maybeSingle();
 
@@ -60,7 +68,8 @@ class UserLessonService {
 
       return response != null ? UserLesson.fromJson(response) : null;
     } catch (e) {
-      throw Exception('Erreur lors de la récupération de la leçon utilisateur: $e');
+      throw Exception(
+          'Erreur lors de la récupération de la leçon utilisateur: $e');
     }
   }
 
@@ -101,6 +110,53 @@ class UserLessonService {
     }
   }
 
+  // Initialiser les premières leçons pour un utilisateur
+  static Future<List<UserLesson>> _initializeFirstLessons(String userId) async {
+    try {
+      // Récupérer tous les niveaux triés par ordre
+      final levels = await LevelService.getLevels();
+
+      if (levels.isEmpty) {
+        return [];
+      }
+
+      // Prendre le premier niveau (avec le plus petit ordre)
+      final firstLevel = levels.first;
+
+      // Récupérer toutes les leçons du premier niveau
+      final lessons = await LessonService.getLessonsByLevel(firstLevel.id);
+
+      if (lessons.isEmpty) {
+        return [];
+      }
+
+      // Créer des entrées UserLesson pour chaque leçon du premier niveau
+      final userLessons = <UserLesson>[];
+      final lessonsData = lessons.map((lesson) => {
+        'user_id': userId,
+        'lesson_id': lesson.id,
+        'completed': false,
+      }).toList();
+
+      // Batch insert with conflict resolution
+      final response = await SupabaseConfig.client
+          .from(_tableName)
+          .upsert(
+            lessonsData,
+            onConflict: 'user_id,lesson_id',
+          )
+          .select();
+
+      for (final json in response) {
+        userLessons.add(UserLesson.fromJson(json));
+      }
+
+      return userLessons;
+    } catch (e) {
+      throw Exception('Erreur lors de l\'initialisation des premières leçons: $e');
+    }
+  }
+
   // Vérifier si une leçon est terminée
   static Future<bool> isLessonCompleted({
     required String userId,
@@ -116,6 +172,4 @@ class UserLessonService {
       throw Exception('Erreur lors de la vérification de la leçon: $e');
     }
   }
-
-  
 }

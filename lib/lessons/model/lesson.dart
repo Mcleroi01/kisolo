@@ -14,25 +14,31 @@ class Lesson extends HiveObject {
   final String levelId;
 
   @HiveField(2)
-  final String title;
-
-  @HiveField(3)
-  final String content;
-
-  @HiveField(4)
   final int order;
 
-  @HiveField(5)
+  @HiveField(3)
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
+
+  @HiveField(4)
+  @JsonKey(name: 'phrase_pt')
+  final String phrasePt;
+
+  @HiveField(5)
+  @JsonKey(name: 'phrase_ln')
+  final String phraseLn;
+
+  @HiveField(6)
+  final String? notes;
 
   Lesson({
     required this.id,
     required this.levelId,
-    required this.title,
-    required this.content,
     required this.order,
     required this.createdAt,
+    required this.phrasePt,
+    required this.phraseLn,
+    this.notes,
   });
 
   factory Lesson.fromJson(Map<String, dynamic> json) => _$LessonFromJson(json);

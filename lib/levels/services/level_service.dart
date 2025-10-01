@@ -1,4 +1,5 @@
 import 'package:kisolo/core/config/supabase_config.dart';
+import 'package:kisolo/core/local_storage/local_storage_service.dart';
 import 'package:kisolo/levels/models/level.dart';
 
 class LevelService {
@@ -7,14 +8,23 @@ class LevelService {
   // Récupérer tous les niveaux triés par ordre
   static Future<List<Level>> getLevels() async {
     try {
+      if (LocalStorageService.hasLevel()) {
+        final levels = LocalStorageService.getLevel();
+        return levels;
+      }
       final response = await SupabaseConfig.client
           .from(_tableName)
           .select()
-          .order('order');
+          .order('order', ascending: true);
 
-      return (response as List)
-          .map((json) => Level.fromJson(json))
-          .toList();
+      final levels =
+          (response as List).map((json) => Level.fromJson(json)).toList();
+
+      if (levels.isNotEmpty) {
+        await LocalStorageService.saveLevels(levels);
+      }
+
+      return levels;
     } catch (e) {
       throw Exception('Erreur lors de la récupération des niveaux: $e');
     }
@@ -87,10 +97,7 @@ class LevelService {
   // Supprimer un niveau
   static Future<void> deleteLevel(String id) async {
     try {
-      await SupabaseConfig.client
-          .from(_tableName)
-          .delete()
-          .eq('id', id);
+      await SupabaseConfig.client.from(_tableName).delete().eq('id', id);
     } catch (e) {
       throw Exception('Erreur lors de la suppression du niveau: $e');
     }

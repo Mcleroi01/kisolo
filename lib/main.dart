@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:kisolo/core/config/supabase_config.dart';
 import 'package:kisolo/core/local_storage/local_storage_service.dart';
 import 'package:kisolo/core/router/app_router.dart';
 
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Load environment variables from .env file
+  await dotenv.load(fileName: ".env.local");
 
   // Initialize Hive
   await Hive.initFlutter();

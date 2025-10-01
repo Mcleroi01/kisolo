@@ -12,6 +12,7 @@ class LessonService {
       if (LocalStorageService.hasLessonsForLevel(levelId)) {
         final localLessons = LocalStorageService.getLessonsForLevel(levelId);
         if (localLessons.isNotEmpty) {
+          print('Lessons loaded from local storage: ${localLessons.length}');
           return localLessons;
         }
       }
@@ -21,7 +22,7 @@ class LessonService {
           .from(_tableName)
           .select()
           .eq('level_id', levelId)
-          .order('order');
+          .order('order', ascending: true);
 
       final lessons = (response as List)
           .map((json) => Lesson.fromJson(json))
