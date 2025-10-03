@@ -7,6 +7,7 @@ import 'package:kisolo/lessons/screens/lesson_screen.dart';
 import 'package:kisolo/core/utils/app_colors.dart';
 import 'package:kisolo/users/services/auth_service.dart';
 import 'package:kisolo/user_progress/services/user_lesson_service.dart';
+import 'package:kisolo/widgets/unified_topbar.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 
@@ -108,7 +109,6 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
     return Scaffold(
       // Utilisation d'une couleur de fond légèrement différente du blanc pur pour un effet moderne
       backgroundColor: AppColors.secondaryBeige, 
-      appBar: _buildAppBar(), // AppBar stylisée
       body: _buildBody(),
     );
   }
@@ -116,36 +116,7 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
   // -------------------------------------------------------------------
   // ## NOUVEAU WIDGET: AppBar Moderne (aligné sur l'UX de la page d'accueil)
   // -------------------------------------------------------------------
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      backgroundColor: AppColors.secondaryBeige, 
-      elevation: 0, // Pas d'ombre
-      automaticallyImplyLeading: false, 
-      title: const Text(
-        'Cours de Portugais 🇵🇹',
-        style: TextStyle(
-          color: AppColors.primaryBlack,
-          fontWeight: FontWeight.w900, // Extra Bold
-          fontSize: 28, 
-        ),
-      ),
-      actions: [
-        // Icône de profil ou d'utilisateur (pour le look moderne)
-        Padding(
-          padding: const EdgeInsets.only(right: 16.0),
-          child: Container(
-            width: 45,
-            height: 45,
-            decoration: BoxDecoration(
-              color: AppColors.accentOrange.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(Icons.person_rounded, color: AppColors.accentOrange, size: 28),
-          ),
-        ),
-      ],
-    );
-  }
+ 
 
   // -------------------------------------------------------------------
   // ## Corps de la Page (Gestion des états)
@@ -156,6 +127,7 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+     
             CircularProgressIndicator(color: AppColors.accentOrange),
             SizedBox(height: 16),
             Text('Chargement des leçons...', style: TextStyle(color: AppColors.primaryBlack)),

@@ -11,7 +11,7 @@ class LocalStorageService {
   // Lessons related
   static const String _lessonsBox = 'lessons_box';
   static const String _userLevelKey = 'user_level';
-  static const String _level = 'levels';
+  static const String _levelsKey = 'levels_list';
 
   static Future<void> init() async {
     // Initialize Hive
@@ -44,7 +44,8 @@ class LocalStorageService {
   }
 
   static Map<String, dynamic>? getUserProfile() {
-    return _box.get(_userProfileKey);
+    final profile = _box.get(_userProfileKey);
+    return profile is Map ? Map<String, dynamic>.from(profile) : null;
   }
 
   // Auth Token
@@ -92,16 +93,38 @@ class LocalStorageService {
         .any((lesson) => lesson.levelId == levelId);
   }
 
+  // ✅ Correction: Sauvegarder les niveaux en JSON
   static Future<void> saveLevels(List<Level> levels) async {
-    await _box.put(_level, levels);
+    try {
+      // Convertir les niveaux en JSON pour les stocker
+      final levelsJson = levels.map((level) => level.toJson()).toList();
+      await _box.put(_levelsKey, levelsJson);
+      print('✅ ${levels.length} niveaux sauvegardés localement');
+    } catch (e) {
+      print('❌ Erreur sauvegarde niveaux: $e');
+    }
   }
 
-  static List<Level> getLevel() {
-    return _box.get(_level) ?? [];
+  // ✅ Correction: Récupérer et convertir depuis JSON
+  static List<Level> getLevels() {
+    try {
+      final levelsData = _box.get(_levelsKey);
+      if (levelsData == null) return [];
+      
+      // Convertir depuis JSON vers objets Level
+      final levelsList = (levelsData as List).cast<Map<dynamic, dynamic>>();
+      return levelsList
+          .map((json) => Level.fromJson(Map<String, dynamic>.from(json)))
+          .toList();
+    } catch (e) {
+      print('❌ Erreur récupération niveaux: $e');
+      return [];
+    }
   }
 
-  static bool hasLevel() {
-    return _box.get(_level) != null;
+  static bool hasLevels() {
+    final levels = _box.get(_levelsKey);
+    return levels != null && (levels as List).isNotEmpty;
   }
 
   // Clear all data

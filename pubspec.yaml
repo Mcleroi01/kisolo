@@ -71,3 +71,7 @@ flutter:
           weight: 600
         - asset: fonts/Nunito-Bold.ttf
           weight: 700
+
+
+dependency_overrides:
+  app_links: ^6.4.1

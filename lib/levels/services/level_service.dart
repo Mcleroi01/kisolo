@@ -8,24 +8,44 @@ class LevelService {
   // Récupérer tous les niveaux triés par ordre
   static Future<List<Level>> getLevels() async {
     try {
-      if (LocalStorageService.hasLevel()) {
-        final levels = LocalStorageService.getLevel();
-        return levels;
+      // Vérifier d'abord le cache local
+      if (LocalStorageService.hasLevels()) {
+        final levels = LocalStorageService.getLevels();
+        if (levels.isNotEmpty) {
+          return levels;
+        }
       }
+
+      // Si pas de cache, récupérer depuis Supabase
       final response = await SupabaseConfig.client
           .from(_tableName)
           .select()
           .order('order', ascending: true);
 
-      final levels =
-          (response as List).map((json) => Level.fromJson(json)).toList();
+      // Convertir la réponse en liste de Level
+      final levels = (response as List)
+          .map((json) => Level.fromJson(Map<String, dynamic>.from(json)))
+          .toList();
 
+      // Sauvegarder en cache
       if (levels.isNotEmpty) {
         await LocalStorageService.saveLevels(levels);
       }
 
       return levels;
     } catch (e) {
+      print('❌ Erreur getLevels: $e');
+
+      // En cas d'erreur réseau, essayer de récupérer depuis le cache
+      try {
+        final cachedLevels = LocalStorageService.getLevels();
+        if (cachedLevels.isNotEmpty) {
+          return cachedLevels;
+        }
+      } catch (cacheError) {
+        print('❌ Erreur cache: $cacheError');
+      }
+
       throw Exception('Erreur lors de la récupération des niveaux: $e');
     }
   }
@@ -39,7 +59,7 @@ class LevelService {
           .eq('id', id)
           .single();
 
-      return Level.fromJson(response);
+      return Level.fromJson(Map<String, dynamic>.from(response));
     } catch (e) {
       throw Exception('Erreur lors de la récupération du niveau: $e');
     }
@@ -62,7 +82,10 @@ class LevelService {
           .select()
           .single();
 
-      return Level.fromJson(response);
+      // Invalider le cache
+      await _invalidateCache();
+
+      return Level.fromJson(Map<String, dynamic>.from(response));
     } catch (e) {
       throw Exception('Erreur lors de la création du niveau: $e');
     }
@@ -88,7 +111,10 @@ class LevelService {
           .select()
           .single();
 
-      return Level.fromJson(response);
+      // Invalider le cache
+      await _invalidateCache();
+
+      return Level.fromJson(Map<String, dynamic>.from(response));
     } catch (e) {
       throw Exception('Erreur lors de la mise à jour du niveau: $e');
     }
@@ -98,8 +124,27 @@ class LevelService {
   static Future<void> deleteLevel(String id) async {
     try {
       await SupabaseConfig.client.from(_tableName).delete().eq('id', id);
+
+      // Invalider le cache
+      await _invalidateCache();
     } catch (e) {
       throw Exception('Erreur lors de la suppression du niveau: $e');
     }
+  }
+
+  // Invalider le cache des niveaux
+  static Future<void> _invalidateCache() async {
+    try {
+      await LocalStorageService.saveLevels([]);
+      print('🗑️ Cache des niveaux invalidé');
+    } catch (e) {
+      print('⚠️ Erreur invalidation cache: $e');
+    }
+  }
+
+  // Forcer le rechargement depuis Supabase
+  static Future<List<Level>> refreshLevels() async {
+    await _invalidateCache();
+    return getLevels();
   }
 }
