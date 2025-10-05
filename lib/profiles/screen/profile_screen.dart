@@ -4,7 +4,6 @@ import 'package:kisolo/core/utils/app_colors.dart';
 import 'package:kisolo/users/services/auth_service.dart';
 import 'package:kisolo/profiles/models/profile.dart';
 import 'package:kisolo/profiles/services/profile_service.dart';
-import 'package:kisolo/widgets/unified_topbar.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -156,7 +155,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
                     child: Column(
                       children: [
-                        const UnifiedTopBar(showProgress: true),
+                      
                         // 1. Carte de profil principal
                         _buildProfileCard(_userProfile!),
                         

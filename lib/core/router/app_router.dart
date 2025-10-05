@@ -69,7 +69,7 @@ final goRouter = GoRouter(
       name: 'home',
       pageBuilder: (context, state) => MaterialPage(
         key: state.pageKey,
-        child: BottomNavigation(
+        child: const BottomNavigation(
           initialIndex: 0,
         ),
       ),

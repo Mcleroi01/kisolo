@@ -53,21 +53,21 @@ class _BottomNavigationState extends State<BottomNavigation> {
 
   // Liste des éléments de navigation avec des icônes modernes
   List<BottomNavigationBarItem> get _navItems => [
-        BottomNavigationBarItem(
+        const BottomNavigationBarItem(
           // Icône normale
-          icon: const Icon(Icons.home_outlined),
+          icon: Icon(Icons.home_outlined),
           // Icône sélectionnée (remplie) pour un meilleur feedback
-          activeIcon: const Icon(Icons.home_rounded),
+          activeIcon: Icon(Icons.home_rounded),
           label: 'Ndaku',
         ),
-        BottomNavigationBarItem(
-          icon: const Icon(Icons.menu_book_outlined),
-          activeIcon: const Icon(Icons.menu_book_rounded),
+        const BottomNavigationBarItem(
+          icon: Icon(Icons.menu_book_outlined),
+          activeIcon: Icon(Icons.menu_book_rounded),
           label: 'Mateya',
         ),
-        BottomNavigationBarItem(
-          icon: const Icon(Icons.person_outline_rounded),
-          activeIcon: const Icon(Icons.person_rounded),
+        const BottomNavigationBarItem(
+          icon: Icon(Icons.person_outline_rounded),
+          activeIcon: Icon(Icons.person_rounded),
           label: 'Profil',
         ),
       ];
@@ -97,7 +97,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
       // -------------------------------------------------------------------
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
-          color: AppColors.pureWhite,
+          color: AppColors.secondaryBeige,
           // Remplacement de l'ombre par une bordure supérieure subtile
           border: Border(
             top: BorderSide(color: AppColors.primaryBlack, width: 0.5),

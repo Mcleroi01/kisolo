@@ -37,10 +37,10 @@ class _UnifiedTopBarState extends State<UnifiedTopBar> {
   Future<void> _loadUserStats() async {
     try {
       final profile = await ProfileService.getCurrentUserProfile();
-      
+
       // Simuler progression globale basée sur les points
       final progress = (profile.points / 1000).clamp(0.0, 1.0);
-      
+
       if (mounted) {
         setState(() {
           _streakDays = 14; // À remplacer par la vraie valeur depuis la DB
@@ -63,7 +63,7 @@ class _UnifiedTopBarState extends State<UnifiedTopBar> {
   Widget build(BuildContext context) {
     final displayProgress = widget.customProgress ?? _globalProgress;
     final currentUser = AuthService.currentUser;
-    
+
     return Container(
       padding: const EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 24.0),
       decoration: BoxDecoration(
@@ -82,32 +82,25 @@ class _UnifiedTopBarState extends State<UnifiedTopBar> {
           GestureDetector(
             onTap: widget.onProfileTap ?? () => context.push('/profile'),
             child: Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: AppColors.accentOrange.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(color: AppColors.accentOrange, width: 2),
-              ),
-              child: currentUser?.userMetadata?['avatar_url'] != null
-                  ? ClipRRect(
-                      borderRadius: BorderRadius.circular(13),
-                      child: Image.network(
-                        currentUser!.userMetadata!['avatar_url'],
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Icon(
-                          Icons.person_rounded,
-                          color: AppColors.accentOrange,
-                          size: 30,
-                        ),
-                      ),
-                    )
-                  : const Icon(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: AppColors.accentOrange.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: AppColors.accentOrange, width: 2),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(13),
+                  child: Image.asset(
+                    'assets/images/avatar.png',
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => const Icon(
                       Icons.person_rounded,
                       color: AppColors.accentOrange,
                       size: 30,
                     ),
-            ),
+                  ),
+                )),
           ),
 
           const SizedBox(width: 16),
@@ -120,7 +113,24 @@ class _UnifiedTopBarState extends State<UnifiedTopBar> {
                 children: [
                   // Texte de progression
                   Text(
-                    _isLoading ? 'Chargement...' : 'Progression globale',
+                    _isLoading
+                        ? 'Chargement...'
+                        : currentUser?.userMetadata?['full_name'] ??
+                            'Utilisateur',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.accentOrange,
+                      fontFamily: 'Nunito',
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+
+                  // Texte de progression
+                  Text(
+                    _isLoading
+                        ? 'Chargement...'
+                        : currentUser?.userMetadata?['points'] ?? '0',
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -128,7 +138,6 @@ class _UnifiedTopBarState extends State<UnifiedTopBar> {
                       fontFamily: 'Nunito',
                     ),
                   ),
-                  const SizedBox(height: 4),
 
                   // Barre de progression
                   _isLoading
@@ -176,7 +185,9 @@ class _UnifiedTopBarState extends State<UnifiedTopBar> {
                     color: Colors.red, size: 20),
                 const SizedBox(width: 6),
                 Text(
-                  _isLoading ? '...' : '$_streakDays',
+                  _isLoading
+                      ? '...'
+                      : currentUser?.userMetadata?['streak_days'] ?? '0',
                   style: const TextStyle(
                     color: AppColors.primaryBlack,
                     fontWeight: FontWeight.w700,

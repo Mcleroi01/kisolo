@@ -16,37 +16,18 @@ class AuthService {
   // 🔐 Connexion avec Google OAuth - Configuration correcte pour Web
   static Future<bool> signInWithProvider() async {
     try {
-      debugPrint('🚀 Début de la connexion OAuth Google');
+      debugPrint('🚀 Connexion OAuth Google - Mobile');
 
-      if (kIsWeb) {
-        // 🌐 MODE WEB : Redirection simple sans popup
-        debugPrint('🌐 Mode Web détecté - Redirection standard');
-        
-        final response = await _client.auth.signInWithOAuth(
-          OAuthProvider.google,
-          redirectTo: 'http://localhost:3000/auth-callback',
-          // ❌ NE PAS utiliser authScreenLaunchMode sur web
-        );
+      final response = await _client.auth.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: 'kisolo://auth-callback',
+        authScreenLaunchMode: LaunchMode.externalApplication,
+      );
 
-        debugPrint('✅ OAuth initié: $response');
-        return response;
-        
-      } else {
-        // 📱 MODE MOBILE : Utiliser deep links
-        debugPrint('📱 Mode Mobile détecté');
-        
-        final response = await _client.auth.signInWithOAuth(
-          OAuthProvider.google,
-          redirectTo: 'kisolo://auth-callback',
-          authScreenLaunchMode: LaunchMode.externalApplication,
-        );
-
-        debugPrint('✅ OAuth initié (mobile): $response');
-        return response;
-      }
+      debugPrint('✅ OAuth initié: $response');
+      return response;
     } catch (e, stackTrace) {
       debugPrint('❌ Erreur OAuth: $e');
-      debugPrint('Stack trace: $stackTrace');
       return false;
     }
   }

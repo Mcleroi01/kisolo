@@ -23,7 +23,7 @@ dependencies:
 
   # Text-to-Speech & Speech Recognition
   flutter_tts: ^4.0.2
-  speech_to_text: ^6.6.1
+
 
   # Local Storage
   shared_preferences: ^2.2.2
@@ -61,6 +61,7 @@ flutter:
     - assets/animations/
     - assets/icons/
     - .env
+    - .env.local
 
   fonts:
     - family: Nunito
@@ -71,7 +72,3 @@ flutter:
           weight: 600
         - asset: fonts/Nunito-Bold.ttf
           weight: 700
-
-
-dependency_overrides:
-  app_links: ^6.4.1

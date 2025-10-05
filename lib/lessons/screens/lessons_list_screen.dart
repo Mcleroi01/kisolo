@@ -236,7 +236,7 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
                     Expanded(
                       child: Text(
                         level.title,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w900,
                           color: AppColors.primaryBlack,
@@ -380,7 +380,7 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
                   const SizedBox(height: 20),
                   Text(
                     'Curriculum (${lessons.length} leçons)',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
                       color: AppColors.primaryBlack, 
