@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:kisolo/core/config/supabase_config.dart';
 import 'package:kisolo/core/local_storage/local_storage_service.dart';
 import 'package:kisolo/levels/models/level.dart';
@@ -43,7 +44,7 @@ class LevelService {
           return cachedLevels;
         }
       } catch (cacheError) {
-        print('❌ Erreur cache: $cacheError');
+        debugPrint('❌ Erreur cache: $cacheError');
       }
 
       throw Exception('Erreur lors de la récupération des niveaux: $e');

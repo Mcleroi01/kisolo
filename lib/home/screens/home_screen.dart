@@ -78,7 +78,7 @@ class HomeScreen extends StatelessWidget {
               const Icon(Icons.school_rounded, color: AppColors.accentOrange),
               const SizedBox(width: 8),
               Text(
-                'Leçon du jour',
+                'Banda Lelo',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: AppColors.textSecondary,
                       fontWeight: FontWeight.w600,
@@ -89,7 +89,7 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(height: 12),
 
           Text(
-            'Salutations et Politesse',
+            'Yekola na Tangu Mukie Elongo na Kisolo',
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   color: AppColors.primaryBlack,
                   fontWeight: FontWeight.w900,
@@ -128,7 +128,7 @@ class HomeScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          "Langue cible",
+          "Monɔkɔ oyo olingi kozwa",
           style: TextStyle(
             color: AppColors.textSecondary,
             fontWeight: FontWeight.w600,

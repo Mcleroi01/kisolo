@@ -73,7 +73,7 @@ class UserLessonService {
     }
   }
 
-  // Marquer une leçon comme terminée
+  // Marquer une leçon spécifique comme terminée
   static Future<UserLesson> completeLesson({
     required String userId,
     required String lessonId,
@@ -107,6 +107,45 @@ class UserLessonService {
       }
     } catch (e) {
       throw Exception('Erreur lors de la mise à jour de la leçon: $e');
+    }
+  }
+
+  // Marquer la prochaine leçon comme terminée (trouve automatiquement la première leçon non terminée)
+  static Future<UserLesson?> completeNextLesson(String userId) async {
+    try {
+      // Récupérer toutes les leçons de l'utilisateur triées par ordre
+      final userLessons = await getUserLessons(userId);
+
+      // Trouver la première leçon non terminée
+      final nextLesson = userLessons.where((lesson) => !lesson.completed).cast<UserLesson?>().firstOrNull;
+
+      if (nextLesson != null) {
+        // Marquer cette leçon comme terminée
+        final response = await SupabaseConfig.client
+            .from(_tableName)
+            .update({'completed': true})
+            .eq('id', nextLesson.id)
+            .select()
+            .single();
+
+        return UserLesson.fromJson(response);
+      }
+
+      return null; // Aucune leçon à marquer comme terminée
+    } catch (e) {
+      throw Exception('Erreur lors de la mise à jour de la prochaine leçon: $e');
+    }
+  }
+
+  // Incrémenter simplement le compteur de leçons terminées (approche alternative)
+  static Future<int> incrementCompletedLessonsCount(String userId) async {
+    try {
+      // Récupérer le nombre actuel de leçons terminées
+      final currentCount = await getCompletedLessonsCount(userId);
+
+      return currentCount + 1;
+    } catch (e) {
+      throw Exception('Erreur lors de l\'incrémentation du compteur: $e');
     }
   }
 
@@ -154,6 +193,37 @@ class UserLessonService {
       return userLessons;
     } catch (e) {
       throw Exception('Erreur lors de l\'initialisation des premières leçons: $e');
+    }
+  }
+
+  // Récupérer le nombre de leçons terminées pour un utilisateur
+  static Future<int> getCompletedLessonsCount(String userId) async {
+    try {
+      final response = await SupabaseConfig.client
+          .from(_tableName)
+          .select('id')
+          .eq('user_id', userId)
+          .eq('completed', true);
+
+      return (response as List).length;
+    } catch (e) {
+      throw Exception('Erreur lors du comptage des leçons terminées: $e');
+    }
+  }
+
+  // Récupérer toutes les leçons terminées pour un utilisateur
+  static Future<List<UserLesson>> getCompletedLessons(String userId) async {
+    try {
+      final response = await SupabaseConfig.client
+          .from(_tableName)
+          .select()
+          .eq('user_id', userId)
+          .eq('completed', true)
+          .order('created_at');
+
+      return (response as List).map((json) => UserLesson.fromJson(json)).toList();
+    } catch (e) {
+      throw Exception('Erreur lors de la récupération des leçons terminées: $e');
     }
   }
 

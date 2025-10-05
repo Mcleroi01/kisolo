@@ -6,24 +6,19 @@ import 'package:kisolo/core/local_storage/local_storage_service.dart';
 class AuthService {
   static final _client = SupabaseConfig.client;
 
-  // Vérifie si l'utilisateur est authentifié
   static bool get isAuthenticated => _client.auth.currentSession != null;
 
-  // Stream des changements d'état d'authentification
   static Stream<AuthState> get authStateChanges =>
       _client.auth.onAuthStateChange;
 
-  // 🔐 Connexion avec Google OAuth - Configuration correcte pour Web
   static Future<bool> signInWithProvider() async {
     try {
-      debugPrint('🚀 Connexion OAuth Google - Mobile');
-
+      
       final response = await _client.auth.signInWithOAuth(
         OAuthProvider.google,
         redirectTo: 'kisolo://auth-callback',
         authScreenLaunchMode: LaunchMode.externalApplication,
       );
-
       debugPrint('✅ OAuth initié: $response');
       return response;
     } catch (e, stackTrace) {
@@ -46,7 +41,6 @@ class AuthService {
 
   static Future<Map<String, dynamic>?> getUserProfile() async {
     try {
-      // Try to get from Supabase first
       final user = currentUser;
       if (user != null) {
         final response = await _client
@@ -59,7 +53,6 @@ class AuthService {
         return response;
       }
 
-      // Fallback to local cache if no internet
       return await _getCachedProfile();
     } catch (e) {
       return await _getCachedProfile();
@@ -110,7 +103,6 @@ class AuthService {
           .update(updates)
           .eq('id', user.id);
 
-      // Update local cache
       final cachedProfile = await _getCachedProfile();
       if (cachedProfile != null) {
         cachedProfile.addAll(updates);

@@ -19,6 +19,10 @@ class Profile {
   final int points;
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
+  @JsonKey(name: 'streak_days')
+  final int streakDays;
+  @JsonKey(name: 'lessons_completed')
+  final int lessonsCompleted;
 
   const Profile({
     required this.id,
@@ -26,6 +30,8 @@ class Profile {
     required this.gender,
     required this.points,
     required this.createdAt,
+    this.streakDays = 0,
+    this.lessonsCompleted = 0,
   });
 
   factory Profile.fromJson(Map<String, dynamic> json) => _$ProfileFromJson(json);
@@ -36,6 +42,8 @@ class Profile {
     String? name,
     Gender? gender,
     int? points,
+    int? streakDays,
+    int? lessonsCompleted,
   }) {
     return Profile(
       id: id,
@@ -43,11 +51,13 @@ class Profile {
       gender: gender ?? this.gender,
       points: points ?? this.points,
       createdAt: createdAt,
+      streakDays: streakDays ?? this.streakDays,
+      lessonsCompleted: lessonsCompleted ?? this.lessonsCompleted,
     );
   }
 
   @override
   String toString() {
-    return 'Profile(id: $id, name: $name, points: $points)';
+    return 'Profile(id: $id, name: $name, points: $points, streakDays: $streakDays, lessonsCompleted: $lessonsCompleted)';
   }
 }
